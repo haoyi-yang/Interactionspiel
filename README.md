@@ -1,2 +1,2 @@
 # Interactionspiel
-Projektseminar von Robotik
+PS_Robotik
