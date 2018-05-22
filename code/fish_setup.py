@@ -24,6 +24,9 @@ class FishPlayer(BasePokerPlayer):  # Do not forget to make parent class as "Bas
     def receive_round_result_message(self, winners, hand_info, round_state):
         pass
 
+    
+    def report_information(self, parameter_list):
+        pass
 
 def setup_ai():
     return FishPlayer()

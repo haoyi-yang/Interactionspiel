@@ -51,8 +51,9 @@ class ModelPlayer(BasePokerPlayer):
         self.nb_player = game_info['player_num']
         self.small_blind_amount = game_info['rule']['small_blind_amount']
         for player in game_info['seats']:
-            if game_info['seats'][player]['uuid'] == self.uuid:
-                self.seat = player
+            if player['uuid'] == self.uuid:
+                self.seat = game_info['seats'].index(player)
+                break
             else:
                 raise('not participating!')
 
@@ -80,7 +81,7 @@ class ModelPlayer(BasePokerPlayer):
 
         with con:
             cur = con.cursor()
-            cur.execute("INSERT INTO ?(?) VALUES(?,?,?,?,?,?,?)", msg_record)
+            cur.execute("INSERT INTO gameinfotbl(Player_name, win_rate, hole_cards, community_cards, action, stack, small_blind_amount) VALUES(?,?,?,?,?,?,?)", msg_record)
 
 
 
@@ -111,12 +112,10 @@ class ModelPlayer(BasePokerPlayer):
     
     def __make_message(self):
         msg = []
-        msg.append(self.table_name)
-        msg.append(self.standard_insert)
         msg.append(self.name)
         msg.append(self.win_rate)
-        msg.append(self.hole_card)
-        msg.append(self.community_card)
+        msg.append(str(self.hole_card))
+        msg.append(str(self.community_card))
         msg.append(self.action)
         msg.append(self.stack)
         msg.append(self.small_blind_amount)
