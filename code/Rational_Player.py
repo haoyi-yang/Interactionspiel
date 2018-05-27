@@ -1,7 +1,6 @@
 from pypokerengine.players import BasePokerPlayer
 from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate
-
-NB_SIMULATION = 1000
+from utils import get_win_rate
 
 class RationalPlayer(BasePokerPlayer):
 
@@ -10,10 +9,7 @@ class RationalPlayer(BasePokerPlayer):
         community_card = round_state['community_card']
         call_amount = valid_actions[1]['amount']
         pot = round_state['pot']['main']['amount']
-        win_rate = estimate_hole_card_win_rate(nb_simulation = NB_SIMULATION,
-                                                nb_player = self.nb_player,
-                                                hole_card=gen_cards(hole_card),
-                                                community_card=gen_cards(community_card))
+        win_rate = get_win_rate(hole_card, community_card)
         ev = self.ev_calculation(win_rate, pot, call_amount)
 
         if ev.index(max(ev)) == 0:

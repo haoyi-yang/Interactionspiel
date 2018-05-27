@@ -62,7 +62,7 @@ class ModelPlayer(BasePokerPlayer):
                     round_strategy[street] = action_later
                     self.my_model.set_round_strategy(round_strategy)
                     simulation_results = []
-                    for i in range(NB_SIMULATION):
+                    for _ in range(NB_SIMULATION):
                         game_state = self._setup_game_state(round_state, hole_card)
                         round_finished_state, _events = self.emulator.run_until_round_finish(game_state)
                         my_stack = [player for player in round_finished_state['table'].seats.players if player.uuid == self.uuid][0].stack
