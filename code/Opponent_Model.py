@@ -2,6 +2,7 @@ from pypokerengine.players import BasePokerPlayer
 from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate
 import random as rand
 import sqlite3 as lite
+from utils import get_win_rate
 
 NB_SIMULATION = 1000
 
@@ -22,10 +23,7 @@ class OpponentModel(BasePokerPlayer):
         pot = round_state['pot']['main']['amount']
         self.small_blind_amount = round_state['small_blind_amount']
 
-        self.win_rate = estimate_hole_card_win_rate(nb_simulation = NB_SIMULATION,
-                                                nb_player = self.nb_player,
-                                                hole_card=gen_cards(hole_card),
-                                                community_card=gen_cards(community_card))
+        self.win_rate = get_win_rate(hole_card, community_card)
         choose_action, amount = self.choose_action(self.win_rate, pot, valid_actions)
         return choose_action, amount
 

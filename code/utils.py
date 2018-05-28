@@ -1,6 +1,6 @@
 import sqlite3 as lite
 from pypokerengine.players import BasePokerPlayer
-from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate
+from pypokerengine.utils.card_utils import gen_cards, estimate_hole_card_win_rate, _pick_unused_card
 import numpy as np
 
 name_database = "game_information.db"
@@ -75,7 +75,7 @@ def get_win_rate_in_database(hole_card, community_card):
 
 def calculate_win_rate(hole_card, community_card):
     ls_win_rate = [.0 for _ in range(10)]
-    rpt_times = 50
+    rpt_times = 10
     counter = 0  ##the newer calculated win percentage must be the avarage number
     while True:
         newer_win_rate = estimate_hole_card_win_rate(nb_simulation = rpt_times,
@@ -91,3 +91,6 @@ def calculate_win_rate(hole_card, community_card):
 
 
     return ls_win_rate[-1]
+
+def assuming_card(my_hole_card):
+    return _pick_unused_card(2, my_hole_card)
