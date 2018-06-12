@@ -18,7 +18,15 @@ def get_win_rate(hole_card, community_card):
         return win_rate
     else:
         raise("invalid win_rate")
-    
+
+
+def get_broad_win_rate(hole_card, community_card):
+    rpt_times = 10
+    if is_win_rate_in_database(hole_card, community_card):
+        win_rate = get_win_rate_in_database(hole_card, community_card)
+    else:
+        win_rate = calculate_broad_win_rate(hole_card, community_card, rpt_times)
+    return win_rate
 
 def record_win_rate(win_rate, hole_card, community_card):
     con = lite.connect('{name_db}'.format(name_db = name_database))
@@ -85,12 +93,43 @@ def calculate_win_rate(hole_card, community_card):
         ls_win_rate.pop(0)
         itered_win_rate = (ls_win_rate[-1] * counter + newer_win_rate) / (counter + 1)
         ls_win_rate.append(itered_win_rate)
-        if (np.max(ls_win_rate) - np.min(ls_win_rate)) < 0.001:
+        if (np.max(ls_win_rate) - np.min(ls_win_rate)) < 0.01:
             break
         counter = counter + 1
 
 
     return ls_win_rate[-1]
 
+def calculate_broad_win_rate(hole_card, community_card, rpt_times):
+    win_rate = estimate_hole_card_win_rate(nb_simulation = rpt_times,
+                                                nb_player = 2, #####only consider 2 players situation
+                                                hole_card=gen_cards(hole_card),
+                                                community_card=gen_cards(community_card))
+    return win_rate
+
 def assuming_card(my_hole_card):
     return _pick_unused_card(2, my_hole_card)
+
+def is_raise_limit_reached(round_state):
+    street_now = round_state['street']
+    raise_count = 0
+    for term in round_state['action_histories'][street_now]:
+        if term['action'] == 'RAISE':
+            raise_count += 1
+    
+    if raise_count >= 3:
+        return True
+    else:
+        return False
+
+def get_self_bet(round_state, valid_actions):
+    bet = (round_state['pot']['main']['amount'] - valid_actions[1]['amount']) / 2
+    
+    return bet
+
+def get_stack(seats, uuid):
+    str_uuid = uuid
+    for player in seats:
+        if player['uuid'] == str_uuid:
+            return player['stack']
+    raise('player not exists')

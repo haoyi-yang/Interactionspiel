@@ -6,7 +6,7 @@ from Opponent_Model import OpponentModel
 import random as rand
 import sqlite3 as lite
 import random
-from utils import get_win_rate, assuming_card
+from utils import get_win_rate, assuming_card, get_broad_win_rate
 import numpy as np
 
 NB_SIMULATION = 10
@@ -27,14 +27,14 @@ class ModelPlayer(BasePokerPlayer):
 
         self.name = name
         self.seat = None
-
+        self.raise_amount = 0
         self.win_rate = None
         self.stack = None
         self.small_blind_amount = None
         self.hole_card = None
         self.community_card = None
         self.action = None
-        self.opponent_raise_threshold = 0.5
+        self.opponent_raise_threshold = 0.7
         self.opponent_bluffing_ratio = 0.5
         self.__init_database()
         self.Opponent_Model = OpponentModel("Opponent",0.5,0.5)
@@ -46,6 +46,7 @@ class ModelPlayer(BasePokerPlayer):
         # community_card = round_state['community_card']
         pot = round_state['pot']['main']['amount']
         call_amount = valid_actions[1]['amount']
+        self.raise_amount = valid_actions[2]['amount']['min']
         # round_strategy = {'preflop' : 0, 'flop' : 0, 'turn' : 0, 'river' : 0, 'showdown' : 0}
         # street_now = round_state['street']
 
@@ -101,7 +102,7 @@ class ModelPlayer(BasePokerPlayer):
             return valid_actions[1]['action'], valid_actions[1]['amount']
 
         else:
-            return valid_actions[2]['action'], 2 * self.small_blind_amount
+            return valid_actions[2]['action'], valid_actions[2]['amount']['min']
 
     def receive_game_start_message(self, game_info):
         self.nb_player = game_info['player_num']
@@ -165,8 +166,8 @@ class ModelPlayer(BasePokerPlayer):
         ev = [0 for i in range(3)]
         ev[0] = -self.self_bet
         ev[1] = win_rate * (pot - self.self_bet) - (1 - win_rate) * (self.self_bet + call_amount)
-        ev[2] = win_rate * (pot - self.self_bet + 2 * self.small_blind_amount) - \
-                        (1 - win_rate) * (self.self_bet + 2 * self.small_blind_amount + call_amount)
+        ev[2] = win_rate * (pot - self.self_bet + self.raise_amount) - \
+                        (1 - win_rate) * (self.self_bet + self.raise_amount + call_amount)
         return ev    
 
     # def choose_action(self, win_rate, pot, valid_actions):                    
@@ -229,7 +230,7 @@ class ModelPlayer(BasePokerPlayer):
         r = rand.random()
         str_card = [str(a) for a in opponent_card]
         for street in street_table.keys():
-            win_rate = get_win_rate(str_card, community_card[0:street_table[street]])
+            win_rate = get_broad_win_rate(str_card, community_card[0:street_table[street]])
             if win_rate < self.opponent_raise_threshold and r < self.opponent_bluffing_ratio:
                 return True
             if street == current_street or street == 'river':
@@ -239,8 +240,10 @@ class ModelPlayer(BasePokerPlayer):
     def simulate_one_time(self, round_state, hole_card):
         game_state = self._setup_game_state(round_state, hole_card)
         _round_finished_state, _events = self.emulator.run_until_round_finish(game_state)
+        if _events[-1]['type'] == 'event_game_finish':
+            return 0 #if not 0, the last round will report a error
         new_winner_uuid = _events[-1]['winners'][-1]['uuid']
-
+        
         # my_stack = [player for player in round_finished_state['table'].seats.players if player.uuid == self.uuid][0].stack
         # simulation_results.append(my_stack)
 
@@ -261,7 +264,7 @@ class ModelPlayer(BasePokerPlayer):
             ls_win_rate.pop(0)
             itered_win_rate = (ls_win_rate[-1] * counter + newer_win_rate) / (counter + 1)
             ls_win_rate.append(itered_win_rate)
-            if (np.max(ls_win_rate) - np.min(ls_win_rate)) < 0.001:
+            if (np.max(ls_win_rate) - np.min(ls_win_rate)) < 0.1:
                 break
             counter = counter + 1
 

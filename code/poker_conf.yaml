@@ -1,11 +1,10 @@
 ante: 0
 blind_structure: null
-initial_stack: 100
-max_round: 10
+initial_stack: 1000
+max_round: 100
 small_blind: 10
 
 ai_players:
-- name: fish_player_1
-  path: fish_setup.py
-- name: fish_player_2
-  path: fish_setup.py
+- name: Interactive_Player
+  path: Interactive_Player.py
+
