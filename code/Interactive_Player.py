@@ -7,13 +7,34 @@ import sqlite3 as lite
 db_name = 'game_information.db'
 class InteractivePlayer(BasePokerPlayer):
     def __init__(self):
-        self.raise_threshold_defensive = 0.8
-        self.fold_threshold_defensive = 0.5
-        self.bluffing_max_defensive = 0.3
+        #First type of defensive player
+        self.raise_threshold_defensive_1 = 0.7
+        self.fold_threshold_defensive_1 = 0.4
+        self.bluffing_max_defensive_1 = 0.3
+
+        #Second type of defensive player
+        self.raise_threshold_defensive_2 = 0.75
+        self.fold_threshold_defensive_2 = 0.45
+        self.bluffing_max_defensive_2 = 0.25
+
+        #Third type of defensive player
+        self.raise_threshold_defensiv_3 = 0.8
+        self.fold_threshold_defensive_3 = 0.5
+        self.bluffing_max_defensive_3 = 0.3
+
+        #First type of aggressive player
+        self.raise_threshold_aggressive_1 = 0.6
+        self.fold_threshold_aggressive_1 = 0.2
+        self.bluffing_max_aggresive_1 = 0.45
+        #Second type of aggressive player
+        self.raise_threshold_aggressive_2 = 0.65
+        self.fold_threshold_aggressive_2 = 0.25
+        self.bluffing_max_aggresive_2 = 0.4
+        #Third type of aggressive player
+        self.raise_threshold_aggressive_3 = 0.7
+        self.fold_threshold_aggressive_3 = 0.3
+        self.bluffing_max_aggresive_3 = 0.35
         
-        self.raise_threshold_aggressive = 0.6
-        self.fold_threshold_aggressive = 0.2
-        self.bluffing_max_aggresive = 0.5
         self.player_type = 0 # 0 = defensiv 1 = aggresiv
         self.strategy_change_count = 50 #how many hands it will change its strategy
         

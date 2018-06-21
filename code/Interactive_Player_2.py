@@ -8,15 +8,36 @@ import sqlite3 as lite
 db_name = 'game_information.db'
 class InteractivePlayer(BasePokerPlayer):
     def __init__(self):
-        self.raise_threshold_defensive = 0.8
-        self.fold_threshold_defensive = 0.5
-        self.bluffing_max_defensive = 0.3
-        
-        self.raise_threshold_aggressive = 0.6
-        self.fold_threshold_aggressive = 0.2
-        self.bluffing_max_aggresive = 0.5
-        self.player_type = 0 # 0 = defensiv 1 = aggresiv
-        self.strategy_change_count = 50 #how many hands it will change its strategy
+        #First type of defensive player
+        self.raise_threshold_defensive_1 = 0.7
+        self.fold_threshold_defensive_1 = 0.4
+        self.bluffing_max_defensive_1 = 0.3
+
+        #Second type of defensive player
+        self.raise_threshold_defensive_2 = 0.75
+        self.fold_threshold_defensive_2 = 0.45
+        self.bluffing_max_defensive_2 = 0.25
+
+        #Third type of defensive player
+        self.raise_threshold_defensive_3 = 0.8
+        self.fold_threshold_defensive_3 = 0.5
+        self.bluffing_max_defensive_3 = 0.3
+
+        #First type of aggressive player
+        self.raise_threshold_aggressive_1 = 0.6
+        self.fold_threshold_aggressive_1 = 0.2
+        self.bluffing_max_aggresive_1 = 0.45
+        #Second type of aggressive player
+        self.raise_threshold_aggressive_2 = 0.65
+        self.fold_threshold_aggressive_2 = 0.25
+        self.bluffing_max_aggresive_2 = 0.4
+        #Third type of aggressive player
+        self.raise_threshold_aggressive_3 = 0.7
+        self.fold_threshold_aggressive_3 = 0.3
+        self.bluffing_max_aggresive_3 = 0.35
+
+        self.player_type = 0 # 0 => defensiv_1 1 => defensive_2 2 => defensive_3 3 => aggressive_1 4 => aggressive_2 5 => aggressive_3
+        self.strategy_change_count = 100 #how many hands it will change its strategy
         
         self.hand_count = 0
         
@@ -65,20 +86,40 @@ class InteractivePlayer(BasePokerPlayer):
         bet = round_state['pot']['main']['amount'] - valid_actions[1]['amount']
         r = np.random.random()
         if self.hand_count % 50 == 0:
-            random_type_array = random.sample([0, 1], 1)
-            self.player_type = random_type_array[0]
+            self.player_type = random.sample(range(6), 1)[0]
+            # self.player_type = random_type_array[0]
             
-                
+        #set the player parameters      
         if self.player_type == 0:
-            raise_threshold = self.raise_threshold_defensive
-            bluffing_threshold = (win_rate - self.fold_threshold_defensive) / \
-                                (self.raise_threshold_defensive - self.fold_threshold_defensive) * self.bluffing_max_defensive
-            fold_threshold = self.fold_threshold_defensive
+            raise_threshold = self.raise_threshold_defensive_1
+            bluffing_threshold = (win_rate - self.fold_threshold_defensive_1) / \
+                                (self.raise_threshold_defensive_1 - self.fold_threshold_defensive_1) * self.bluffing_max_defensive_1
+            fold_threshold = self.fold_threshold_defensive_1
         elif self.player_type == 1:
-            raise_threshold = self.raise_threshold_aggressive
-            bluffing_threshold = (win_rate - self.fold_threshold_aggressive) / \
-                                (self.raise_threshold_aggressive - self.fold_threshold_aggressive) * self.bluffing_max_aggresive
-            fold_threshold = self.fold_threshold_aggressive
+            raise_threshold = self.raise_threshold_defensive_2
+            bluffing_threshold = (win_rate - self.fold_threshold_defensive_2) / \
+                                (self.raise_threshold_defensive_2 - self.fold_threshold_defensive_2) * self.bluffing_max_defensive_2
+            fold_threshold = self.fold_threshold_defensive_2
+        elif self.player_type == 2:
+            raise_threshold = self.raise_threshold_defensive_3
+            bluffing_threshold = (win_rate - self.fold_threshold_defensive_3) / \
+                                (self.raise_threshold_defensive_3 - self.fold_threshold_defensive_3) * self.bluffing_max_defensive_3
+            fold_threshold = self.fold_threshold_defensive_3
+        elif self.player_type == 3:
+            raise_threshold = self.raise_threshold_aggressive_1
+            bluffing_threshold = (win_rate - self.fold_threshold_aggressive_1) / \
+                                (self.raise_threshold_aggressive_1 - self.fold_threshold_aggressive_1) * self.bluffing_max_aggresive_1
+            fold_threshold = self.fold_threshold_aggressive_1
+        elif self.player_type == 4:
+            raise_threshold = self.raise_threshold_aggressive_2
+            bluffing_threshold = (win_rate - self.fold_threshold_aggressive_2) / \
+                                (self.raise_threshold_aggressive_2 - self.fold_threshold_aggressive_2) * self.bluffing_max_aggresive_2
+            fold_threshold = self.fold_threshold_aggressive_2
+        elif self.player_type == 5:
+            raise_threshold = self.raise_threshold_aggressive_3
+            bluffing_threshold = (win_rate - self.fold_threshold_aggressive_3) / \
+                                (self.raise_threshold_aggressive_3 - self.fold_threshold_aggressive_3) * self.bluffing_max_aggresive_3
+            fold_threshold = self.fold_threshold_aggressive_3   
         else:
             raise('?????')
 
@@ -121,9 +162,19 @@ class InteractivePlayer(BasePokerPlayer):
                 record.append(self.opponent_raise_count / 50.)
 
                 if self.player_type == 0:
-                    record.append('defensive')
+                    record.append('defensive_1_r0.70f0.40b0.30')
+                elif self.player_type == 1:
+                    record.append('defensive_2_r0.75f0.45b0.25')
+                elif self.player_type == 2:
+                    record.append('defensive_3_r0.80f0.50b0.30')
+                elif self.player_type == 3:
+                    record.append('aggressive_1_r0.60f0.20b0.45')
+                elif self.player_type == 4:
+                    record.append('aggressive_2_r0.65f0.25b0.40')
+                elif self.player_type == 5:
+                    record.append('aggressive_3_r0.70f0.30b0.35')
                 else:
-                    record.append('aggressive')
+                    raise('>>>>>>>no such type<<<<<<<<<<')
 
                 self.opponent_fold_count = 0
                 self.opponent_raise_count = 0
