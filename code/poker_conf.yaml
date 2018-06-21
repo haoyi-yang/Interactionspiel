@@ -6,5 +6,5 @@ small_blind: 10
 
 ai_players:
 - name: Interactive_Player
-  path: Interactive_Player.py
+  path: Interactive_Player_2.py
 

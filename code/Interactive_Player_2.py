@@ -9,8 +9,8 @@ db_name = 'game_information.db'
 class InteractivePlayer(BasePokerPlayer):
     def __init__(self):
         #First type of defensive player
-        self.raise_threshold_defensive_1 = 0.7
-        self.fold_threshold_defensive_1 = 0.4
+        self.raise_threshold_defensive_1 = 0.8
+        self.fold_threshold_defensive_1 = 0.5
         self.bluffing_max_defensive_1 = 0.3
 
         #Second type of defensive player
@@ -19,8 +19,8 @@ class InteractivePlayer(BasePokerPlayer):
         self.bluffing_max_defensive_2 = 0.25
 
         #Third type of defensive player
-        self.raise_threshold_defensive_3 = 0.8
-        self.fold_threshold_defensive_3 = 0.5
+        self.raise_threshold_defensive_3 = 0.7
+        self.fold_threshold_defensive_3 = 0.4
         self.bluffing_max_defensive_3 = 0.3
 
         #First type of aggressive player
@@ -83,7 +83,9 @@ class InteractivePlayer(BasePokerPlayer):
     
     def choose_action(self, win_rate, round_state, valid_actions):
         self.hand_count += 1
-        bet = round_state['pot']['main']['amount'] - valid_actions[1]['amount']
+        # bet = round_state['pot']['main']['amount'] - valid_actions[1]['amount']
+        bet = self.parse_self_bet(round_state)
+        betOpponent = round_state['pot']['main']['amount']
         r = np.random.random()
         if self.hand_count % 50 == 0:
             self.player_type = random.sample(range(6), 1)[0]
@@ -125,8 +127,7 @@ class InteractivePlayer(BasePokerPlayer):
 
         # print("The bet is ", round_state['pot']['main']['amount'] - valid_actions[1]['amount']) 
         EV_fold = -bet
-        EV_call = (2 * win_rate - 1) * valid_actions[1]['amount']
-
+        EV_call = (2 * win_rate - 1) * betOpponent
         if win_rate > raise_threshold:
             if not is_raise_limit_reached(round_state):
                 return valid_actions[2]['action'], valid_actions[2]['amount']['min']
@@ -141,7 +142,15 @@ class InteractivePlayer(BasePokerPlayer):
             return valid_actions[2]['action'], valid_actions[2]['amount']['min']
         else:
             return valid_actions[1]['action'], valid_actions[1]['amount']
-        
+    def parse_self_bet(self, round_state):
+        Bet = 0
+        BetThisRound = 0
+        for street in round_state['action_histories']:
+            for item in round_state['action_histories'][street]:
+                if item['uuid'] == self.uuid:
+                    BetThisRound = item['amount']
+            Bet += BetThisRound
+        return Bet
         
     def record_opponent(self, new_action, round_state):
         if not new_action['player_uuid'] == self.uuid:
@@ -162,11 +171,11 @@ class InteractivePlayer(BasePokerPlayer):
                 record.append(self.opponent_raise_count / 50.)
 
                 if self.player_type == 0:
-                    record.append('defensive_1_r0.70f0.40b0.30')
+                    record.append('defensive_1_r0.80f0.50b0.30')
                 elif self.player_type == 1:
                     record.append('defensive_2_r0.75f0.45b0.25')
                 elif self.player_type == 2:
-                    record.append('defensive_3_r0.80f0.50b0.30')
+                    record.append('defensive_3_r0.70f0.40b0.30')
                 elif self.player_type == 3:
                     record.append('aggressive_1_r0.60f0.20b0.45')
                 elif self.player_type == 4:
