@@ -1,0 +1,218 @@
+\documentclass[journal,final,a4paper,twoside]{PS}
+
+%%% Dieser Block ist dem Betreuer des Projektseminars vorbehalten
+\usepackage{PS}             % Alle Definitionen über den Seitenstil (auf keinen Fall editieren!!)
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+
+\def\lehrveranstaltung{PROJEKTSEMINAR ROBOTIK UND COMPUTATIONAL INTELLIGENCE}
+\def\ausgabe{Vol.18,~SS~2018}
+\setcounter{page}{1}        % Hier die Seitennummer der Startseite für Gesamtdokument festlegen
+
+%%% Ab hier können Einträge von den Teilnehmern des Projektseminars gemacht werden
+%%% Wenn neben den LaTeX-Paketen aus der Datei PS.sty noch weitere gebraucht werden,
+%%% so ist dies dringend mit dem Betreuer abzuklären!
+
+\begin{document}
+\newcommand{\euertitel}{Interaktion in Spielen mit Unsicherheit}   % Titel hier eintragen!
+\newcommand{\betreuer}{M.Sc. Moritz Bühler }  % Betreuerdaten hier eintragen (mit einem Leerzeichen am Ende)!
+
+\headsep 40pt
+\title{\euertitel}
+% Autorennamen in der Form "Vorname Nachname" angeben, alphabetisch nach Nachname sortieren,
+% nach dem letzen Autor kein Komma setzen, sondern mit \thanks abschließen
+\author{Dominik Hillen,
+        Marco,
+       Haoyi Yang
+\thanks{Diese Arbeit wurde von \betreuer unterstützt.}}
+
+\maketitle
+
+
+\begin{Zusammenfassung}
+Im Rahmen der Seminararbeit wurde ein Pokeragent entwickelt, welcher gegen einen realen Agenten (Menschen) spielt. Die Interaktion in dem Spiel wird durch das Setzverhalten der Agenten bestimmt. Im Anfangszustand spielt der Pokeragent eine fest definierte, strickt rationale Strategie, damit Informationen über das Verhalten des realen Agenten gesammelt werden können. Im Laufe des Spiels wird die Strategie des Pokeragenten variiert. Vorherige Daten (Referenzdaten) werden nun mit den neuen Daten verglichen, um etwaige Unterschiede bzw. Verhaltensveränderungen des realen Agenten zu untersuchen.
+%Hierhin kommt eine kurze (5-6 Sätze) Zusammenfassung der Arbeit. In diesem Fall beschreibt das Dokument die \LaTeX -Vorlage für die Erstellung der Ausarbeitungen eines Projektseminars.
+\end{Zusammenfassung}
+\vspace{6pt}
+
+\begin{abstract}
+This is the english translation of your \glqq Zusammenfassung \grqq.
+\end{abstract}
+
+\section{Einführung}
+
+\PARstart{D}{iese} \LaTeX -Vorlage (PS\_Vorlage.tex) soll als
+Vorlage für die Erstellung der Ausarbeitungen des Projektseminars
+Automatisierungstechnik dienen. Zusätzlich wird die
+Style-Vorlage PS.cls benötigt. Die Dokumente basieren auf den IEEE
+Vorlagen bare\_jrnl.tex Version 1.2 und IEEEtran.cls Version 1.6b
+(Online auf den Autorenseiten des IEEE erhältlich) und sind für
+dieses Projektseminar angepasst worden. Viel Freunde bei der
+Erstellung eurer Arbeit.
+
+Bitte beachtet auch die Hinweise zum Verfassen wissenschaftlicher Texte in Anhang~\ref{sec:richtlinien} und~\ref{sec:notation}.
+
+In der Einführung sollte kurz beschrieben werden, was die Problemstellung der Arbeit ist, welche Vorarbeiten es schon gibt (``Stand der Technik'' mit Verweis auf passende Quellen) und was der neue Beitrag der Arbeit ist. Am Ende der Einführung kann kurz auf die Struktur des Artikels eingegangen werden, z.B.: 
+
+Abschnitt~\ref{sec:grundlangen} führt wichtige Grundlagen ein und Abschnitt~\ref{sec:zus} fasst schließlich die Ergebnisse zusammen und gibt einen Ausblick.
+
+\section{Grundlagen}
+\label{sec:grundlangen}
+
+\subsection{Pokerregeln}
+\subsubsection{Spielzubehör}
+Das Spiel besteht aus einem französischem Spielkartenset mit 52 Karten (mit den Spielkarten 2 bis As in den vier Farben Kreuz Pik Herz und Karo). Zusätzlich erhält jeder Spieler die gleiche Anzahl von Chips, um welche im weiteren Verlauf gespielt wird.
+\subsubsection{Position}
+
+Die Position der Spieler haben unterschiedliche Bedeutung. Ein Spieler wird am Anfang als Dealer festgelegt. Der nächste Spieler (im Uhrzeigersinn) heißt Small Blind und der darauffolgende ist der Big Blind. Am Ende jeder Runde wechselt die Aufgabe im Uhrzeigersinn um eine Position weiter.
+\begin{itemize}
+ \item Dealer: Der Dealer ist verantwortlich für das Mischen und Austeilen der Karten.
+\item Small Blind: Der Small Blind muss am Anfang  der Runde eine fest definierte Anzahl an Chips setzen. Diese Anzahl von Chips wird ebenfalls Small Blind genannt.
+\item Big Blind: Der Big Blind muss am Anfang die doppelte Anzahl des Small Blind setzen, den Big Blind.
+\end{itemize}
+Einen Sonderfall bildet das Heads-Up. Hier sind nur zwei Spieler beteiligt, darum überschneidet sich in diesem Fall eine Position. Somit ist der Dealer gleichzeitig der Big Blind.\\
+Es beginnt der Spieler der sich auf der darauffolgenden Position des Big Blinds befindet. Im Fall des Heads-Up beginnt somit der Spieler an der Small Blind Position.
+\subsubsection{Handlungsmöglichkeiten}
+Ein Spieler hat drei verschiedene Handlungsmöglichkeiten:
+\begin{itemize}
+\item Call/Check:  Ein Call bedeutet so viel wie gleichziehen. Ein Spieler callt wenn er aktiv an der Spielrunde teilnehmen will. Er muss dazu genau so viele Chips setzen, wie der Spieler der bisher die meisten Chips gesetzt hat. Hat noch niemand gesetzt muss er einen Big Blind setzen um zu callen.
+ Ein Check ist ein Sonderfall des Calls. Der Spieler der an der Reihe ist hat schon gleich viele Chips gesetzt. Zum Beispiel wurde nur maximal der Big Blind gesetzt und der Spieler der sich auf der Big Blind Position befindet möchte nicht erhöhen, so kann er checken um die Spielphase zu Beenden.
+\item Raise: Ein Spieler erhöht bzw. setzt mehr Chips als sein Vorgänger.
+\item Fold: Der Spieler  setzt keine Chips und verliert  alle seine zuvor  gesetzten Chips und verliert zudem die Möglichkeit den Pot zu gewinnen.
+\end{itemize}
+\subsubsection{Spielablauf}
+Das Spiel besteht aus vier Spielphasen gefolgt von einer Setz(Wett-)phase. Am Ende der Setzphase haben alle Spieler gleichviel gesetzt, sofern sie nicht gefoldet haben.
+\begin{itemize}
+\item Preflop: Im Preflop müssen jeweils Small und Big Blind ihre Chips setzen. Danach bekommt jeder Spieler zwei Karten, die nur der Spieler selbst sehen kann. Es folgt die Setzphase.
+\item Flop:  Es werden drei Karten aus dem restlichen Kartenstapel offen auf den Tisch gelegt. Danach wird wieder gesetzt.
+\item Turn: Im Turn wird eine weitere Karte auf offen neben dem Flop gelegt. und es beginnt wieder eine Setzphase.
+\item River:  Das ist die letzte Spielphase. Es wird noch eine Karte offen auf den Tisch gelegt und es beginnt die letzte Setzphase. Wenn mehrere Spieler gleichgezogen haben endet die Spielphase und es kommt zum sogenannten Show Down. Die Spieler zeigen ihre Handkarten und es zeigt sich, wer mit seinen Handkarten und den offenen Karten die beste Kombination hat. Dieser Spieler gewinnt alle gesetzten Chips (den Pot).
+\end{itemize}
+\textcolor{red}{\textbf{eventuell Grafik mit phasen und handlungsalternativen}}!
+
+Meistens werden in einer Pokerrunde nicht alle Spielphasen durchlaufen, da vorher die Spieler aus der Runde ausgestiegen(fold) sind. Somit kommt es auch nicht zum Showdown. Es gewinnt dann der Spieler den Pot der die meisten Chips gesetzt hat.
+
+\subsubsection{Kartenwertigkeit}
+Aus den zwei Handkarten eines Spielers und den maximal fünf offenen Karten (community cards) , gilt es die beste Kombination gegenüber den Gegnern zu haben um im Falle des Showdown den Pot zu gewinnen. Insgesamt zählt aber nur eine Kombination aus maximal fünf Karten.
+Kartenkombinationen:
+Mit dem Begriff Farbe ist im Folgenden Kreuz, Pik, Herz \textcolor{red}{\llap{$\heartsuit$}}
+ und Karo %\diamondsuit{} 
+gemeint.\\
+\includegraphics[width=4in,height=2.8in,clip,keepaspectratio]{./pics/Kartenwertigkeit.JPG}\\
+\cite{Kartenwert}
+Quelle:http://www.poker-abc.ch/Wertigkeit.aspx
+
+\subsubsection{Spielende}
+
+\subsection{Einschränkungen}
+Es wurden mehrere Vereinfachungen/Einschränkungen an das Spiel gestellt, um schneller ein Profil des realen Agenten (Opponent Modelling) entwerfen zu können. Zum einen wurde sich für die Spielvariante Texas Hold'em Fixed Limit, bei der ein festgelegter Betrag gesetzt werden kann und zudem wird am Ende jeder Spielrunde die Karten offen dargelegt, so dass realer Agent und Pokeragent nach jeder Runde vollständige Informationen haben. Zusätzlich wird nur im Heads-Up gespielt, d.h. es spielen nur zwei Agenten gegeneinander.
+
+\subsection{Opponent-Modelling}
+Opponent-Modelling beschreibt ein Verfahren zur Modellierung eines Gegners, um dessen Verhalten vorrauszusagen.
+In Poker unterscheidet man zwischen vier Spieltypen:
+\begin{itemize}
+\item Die Calling Station:
+Die Calling Station stellt unseren liebsten Gegner dar. Sie spielt preflop in der Regel sehr loose (d.h. sie geht mit zu vielen Händen mit) und callt oft gegen ihre Odds, also auf minderwertigen Draws. Außerdem spielt sie sehr passiv und versäumt es, aus ihren Händen das Maximum an Value herauszuholen.
+Gegen eine Calling Station erhöhen wir unseren Gewinn, wenn wir mit mehr Händen für
+value-betten. Stoßen wir auf Widerstand, so können wir uns weiterhin oft sicher sein, gegen eine sehr starke Hand zu spielen und haben für unsere schlechteren Hände einen einfachen Fold.
+\item Der Loose-Aggressive Spieler (LAG):
+Der LAG spielt wie die Calling Station auch preflop sehr viele Hände. Allerdings ist ein LAG sehr viel aggressiver und er versucht oft durch Raises und Bets den Pot zu stehlen. Auch hier haben wir die Möglichkeit, mit einer etwas größeren Range unserer Hände für Value zu betten, wenngleich der LAG oft versucht trickreich zu spielen. Der Extremfall das LAGs ist der Maniac, der praktisch mit jeder Hand raist und dadurch versucht, seine Gegner aus dem Pot zu treiben.
+\item Der Rock: 
+Der Rock ist das genaue Gegenstück zum Maniac. Er spielt preflop extrem tight, also nur
+die besten Starthände. Wenn der Rock im Spiel ist, dann können wir also von einer sehr starken Hand ausgehen. Ein Schwachpunkt des Rocks ist es jedoch, dass er teilweise ängstlich und mit seinen starken Händen ziemlich gradlinig spielt, so dass wir einerseits unsere schwächeren Hände wieder relativ leicht folden können und andererseits versuchen können Pots zu stehlen, in denen wir beide nichts getroffen haben, da er solche Hände in den allermeisten fällen foldet. Weiterhin sollten wir die Möglichkeit nutzen und versuchen häufig seine Blinds zu stehlen.
+\item Der Tight-Aggressive Spieler (TAG):
+Der TAG repräsentiert den Gegnertyp, dem wir selbst am nächsten kommen und kann deshalb
+in gewisser Weise als unser Angstgegner angesehen werden. Er spielt preflop relativ tight, also nur ausgewählte Starthände. Ist er im Pot, müssen wir immer aufpassen, da er ziemlich aggressiv und trickreich spielt und wir oft nicht mit Gewissheit sagen können, welche Hand unser Gegner hält.
+\end{itemize}
+
+\textcolor{red}{\textbf{Quelle: Copy paste proceedings Poker challenge}}.
+
+Mittels Opponent-Modelling soll der Gegner in eine der ersten drei Spielertypenkategorien eingestuft werden. Der vierte Spielertyp entspricht den Profispieler. Er wechselt oft seine Strategie oder er blufft zufällig um sich schlechter einschätzen zu lassen. Er wurde in diesem Szenario vernachlässigt, da es sehr Umfangreich und komplex ist sein Verhalten abzuschätzen.
+
+\subsection{Funktionsweise}
+Unser Algorithmus, wie funktioniert er\dots
+Quelle Github.. veränderungen an Software
+
+\subsection{Strategie und Strategiewechsel}
+
+
+
+\subsection{Auswertung der Daten, Rückschlüsse, Ergebnis}
+\section{Zusammenfassung}
+\label{sec:zus}
+
+Hier die wichtigsten Ergebnisse der Arbeit in 5-10 Sätzen zusammenfassen. Dies sollte keine Wiederholung des Abstracts oder der Einführung sein. Insbesondere kann hier ein Ausblick auf zukünftige Arbeiten gegeben werden.
+
+
+\appendices
+\section{Optionaler Titel}
+Anhang eins.
+\section{}
+Anhang zwei.
+
+\section{Richtlinien für das Verfassen wissenschaftlicher Arbeiten}
+\label{sec:richtlinien}
+Im Folgenden werden einige wichtige Richtlinien zusammengefasst. Die Aufzählung ist allerdings nicht erschöpfend.
+
+\begin{itemize}
+ \item Klare Darstellung, was der Eigenanteil ist und was schon vorhanden war.
+ \item Vorsicht vor Plagiaten: vollständige Quellenangaben, auch bei Bildern. Es sollte immer klar ersichtlich sein, was der Eigenanteil ist und was aus Quellen entnommen wurde.
+ \item Bilder nicht 1:1 aus Quellen kopieren.
+ \item Diskussion der Ergebnisse (Simulationen, Messungen, Rechnungen): Wurde das Ergebnis so erwartet? Wenn nein, was sind mögliche Gründe?
+ \item Autoren: Als Autor sollte jede Person in Betracht gezogen werden, die wesentlich zur Arbeit beigetragen hat (siehe auch die Empfehlungen der DFG diesbezüglich, vgl.~\cite{wissPraxis:DFG}). Alle Personen mit kleinerem Beitrag (fachliche Hinweise, Beteiligung an Datensammlung etc.) können in der Danksagung oder einer Fußnote erwähnt werden.
+\item Formeln in den Satz einbetten und alle Variablen bei der ersten Verwendung im Text einführen. Beispiel:
+ Für die Temperatur ergibt sich damit
+ \begin{align*}
+  T(h) = K h^2,
+ \end{align*}
+ sie hängt quadratisch von der Höhe $h$ ab.
+\end{itemize}
+
+\section{Hinweise zur Notation}
+\label{sec:notation}
+\begin{itemize}
+ \item Abkürzungen bei der ersten Verwendung erklären, z.B.: ``DFG (Deutsche Forschungsgemeinschaft)''.
+ \item Formelzeichen konsistent benennen, nicht zwischen den Abschnitten umbenennen. Formelzeichen kursiv schreiben, z.B. Variable $a$.
+ \item Auf korrekte Dimensionen und Einheiten achten. Für Einheiten das SI-System verwenden, z.B. das LaTeX-Paket \emph{units} oder \emph{SIunits}.
+ \item Zahlen: Im Deutschen Komma als Dezimaltrennzeichen, im Englischen Punkt.
+ \item Tabellen haben Überschriften, Diagramme haben Unterschriften.
+ \item Diagramme: Achsenbeschriftungen hinreichend groß (insbesondere die Zahlen).
+ \item Diagrammunterschriften sollen im Wesentlichen ausreichen, um das Diagramm zu verstehen.
+ \item Indizes werden \emph{kursiv} gesetzt, wenn sie die Bedeutung von Variablen haben, ansonsten \textbf{normal}. Beispiele: $V_k, \ k=1,2,\ldots$ und $V_\mathrm{input}$.
+\end{itemize}
+
+
+
+
+\section*{Danksagung}
+Wenn ihr jemanden danken wollt, der Euch bei der Arbeit besonders
+unterstützt hat (Korrekturlesen, fachliche Hinweise,...), dann ist hier der dafür vorgesehene Platz.
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliographystyle{gerunsrt}
+\bibliography{./bib/literature}
+%\begin{thebibliography}{1}
+
+%\bibitem{IEEEhowto:kopka}
+%H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed. Harlow, England: Addison-Wesley, 1999.
+%\bibitem{wissPraxis:DFG}
+%Deutsche Forschungsgemeinschaft, \emph{Vorschläge zur Sicherung guter wissenschaftlicher Praxis}, Denkschrift, Weinheim: Wiley-VCH, 1998.
+%\end{thebibliography}
+
+\begin{biography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./pics/ComicKopf.eps}}] % hier ein Foto einbinden
+{Autor A}
+Biographie Autor A.
+\end{biography}
+\begin{biography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./pics/ComicKopf.eps}}] % hier ein Foto einbinden
+{Autor B}
+Biographie Autor B.
+\end{biography}
+\begin{biography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./pics/ComicKopf.eps}}] % hier ein Foto einbinden
+{Autor C}
+Biographie Autor C.
+\end{biography}
+
+\end{document}

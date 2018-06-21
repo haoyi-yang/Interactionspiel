@@ -1,0 +1,140 @@
+\documentclass[journal,final,a4paper,twoside]{PS}
+
+%%% Dieser Block ist dem Betreuer des Projektseminars vorbehalten
+\usepackage{PS}             % Alle Definitionen über den Seitenstil (auf keinen Fall editieren!!)
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+
+\def\lehrveranstaltung{Projektseminar Automatisierungstechnik}
+\def\ausgabe{Vol.7,~WS~13/14}
+\setcounter{page}{1}        % Hier die Seitennummer der Startseite für Gesamtdokument festlegen
+
+%%% Ab hier können Einträge von den Teilnehmern des Projektseminars gemacht werden
+%%% Wenn neben den LaTeX-Paketen aus der Datei PS.sty noch weitere gebraucht werden,
+%%% so ist dies dringend mit dem Betreuer abzuklären!
+
+\begin{document}
+\newcommand{\euertitel}{Titel der Ausarbeitung}   % Titel hier eintragen!
+\newcommand{\betreuer}{Akad.Titel Vorname Name }  % Betreuerdaten hier eintragen (mit einem Leerzeichen am Ende)!
+
+\headsep 40pt
+\title{\euertitel}
+% Autorennamen in der Form "Vorname Nachname" angeben, alphabetisch nach Nachname sortieren,
+% nach dem letzen Autor kein Komma setzen, sondern mit \thanks abschließen
+\author{Autor~A,
+        Autor~B,
+        Autor~C
+\thanks{Diese Arbeit wurde von \betreuer unterstützt.}}
+
+\maketitle
+
+
+\begin{Zusammenfassung}
+Hierhin kommt eine kurze (5-6 Sätze) Zusammenfassung der Arbeit. In diesem Fall beschreibt das Dokument die \LaTeX -Vorlage für die Erstellung der Ausarbeitungen eines Projektseminars.
+\end{Zusammenfassung}
+\vspace{6pt}
+
+\begin{abstract}
+This is the english translation of your \glqq Zusammenfassung \grqq.
+\end{abstract}
+
+\section{Einführung}
+
+\PARstart{D}{iese} \LaTeX -Vorlage (PS\_Vorlage.tex) soll als
+Vorlage für die Erstellung der Ausarbeitungen des Projektseminars
+Automatisierungstechnik dienen. Zusätzlich wird die
+Style-Vorlage PS.cls benötigt. Die Dokumente basieren auf den IEEE
+Vorlagen bare\_jrnl.tex Version 1.2 und IEEEtran.cls Version 1.6b
+(Online auf den Autorenseiten des IEEE erhältlich) und sind für
+dieses Projektseminar angepasst worden. Viel Freunde bei der
+Erstellung eurer Arbeit.
+
+Bitte beachtet auch die Hinweise zum Verfassen wissenschaftlicher Texte in Anhang~\ref{sec:richtlinien} und~\ref{sec:notation}.
+
+In der Einführung sollte kurz beschrieben werden, was die Problemstellung der Arbeit ist, welche Vorarbeiten es schon gibt (``Stand der Technik'' mit Verweis auf passende Quellen) und was der neue Beitrag der Arbeit ist. Am Ende der Einführung kann kurz auf die Struktur des Artikels eingegangen werden, z.B.: 
+
+Abschnitt~\ref{sec:grundlangen} führt wichtige Grundlagen ein und Abschnitt~\ref{sec:zus} fasst schließlich die Ergebnisse zusammen und gibt einen Ausblick.
+
+\section{Grundlagen}
+\label{sec:grundlangen}
+
+\subsection{Dies ist ein Unterabschnitt}
+Subsection text.
+\subsubsection{Dies ist ein Unter-Unterabschnitt}
+Subsubsection text.
+
+
+
+
+\section{Zusammenfassung}
+\label{sec:zus}
+Hier die wichtigsten Ergebnisse der Arbeit in 5-10 Sätzen zusammenfassen. Dies sollte keine Wiederholung des Abstracts oder der Einführung sein. Insbesondere kann hier ein Ausblick auf zukünftige Arbeiten gegeben werden.
+
+
+\appendices
+\section{Optionaler Titel}
+Anhang eins.
+\section{}
+Anhang zwei.
+
+\section{Richtlinien für das Verfassen wissenschaftlicher Arbeiten}
+\label{sec:richtlinien}
+Im Folgenden werden einige wichtige Richtlinien zusammengefasst. Die Aufzählung ist allerdings nicht erschöpfend.
+
+\begin{itemize}
+ \item Klare Darstellung, was der Eigenanteil ist und was schon vorhanden war.
+ \item Vorsicht vor Plagiaten: vollständige Quellenangaben, auch bei Bildern. Es sollte immer klar ersichtlich sein, was der Eigenanteil ist und was aus Quellen entnommen wurde.
+ \item Bilder nicht 1:1 aus Quellen kopieren.
+ \item Diskussion der Ergebnisse (Simulationen, Messungen, Rechnungen): Wurde das Ergebnis so erwartet? Wenn nein, was sind mögliche Gründe?
+ \item Autoren: Als Autor sollte jede Person in Betracht gezogen werden, die wesentlich zur Arbeit beigetragen hat (siehe auch die Empfehlungen der DFG diesbezüglich, vgl.~\cite{wissPraxis:DFG}). Alle Personen mit kleinerem Beitrag (fachliche Hinweise, Beteiligung an Datensammlung etc.) können in der Danksagung oder einer Fußnote erwähnt werden.
+\item Formeln in den Satz einbetten und alle Variablen bei der ersten Verwendung im Text einführen. Beispiel:
+ Für die Temperatur ergibt sich damit
+ \begin{align*}
+  T(h) = K h^2,
+ \end{align*}
+ sie hängt quadratisch von der Höhe $h$ ab.
+\end{itemize}
+
+\section{Hinweise zur Notation}
+\label{sec:notation}
+\begin{itemize}
+ \item Abkürzungen bei der ersten Verwendung erklären, z.B.: ``DFG (Deutsche Forschungsgemeinschaft)''.
+ \item Formelzeichen konsistent benennen, nicht zwischen den Abschnitten umbenennen. Formelzeichen kursiv schreiben, z.B. Variable $a$.
+ \item Auf korrekte Dimensionen und Einheiten achten. Für Einheiten das SI-System verwenden, z.B. das LaTeX-Paket \emph{units} oder \emph{SIunits}.
+ \item Zahlen: Im Deutschen Komma als Dezimaltrennzeichen, im Englischen Punkt.
+ \item Tabellen haben Überschriften, Diagramme haben Unterschriften.
+ \item Diagramme: Achsenbeschriftungen hinreichend groß (insbesondere die Zahlen).
+ \item Diagrammunterschriften sollen im Wesentlichen ausreichen, um das Diagramm zu verstehen.
+ \item Indizes werden \emph{kursiv} gesetzt, wenn sie die Bedeutung von Variablen haben, ansonsten \textbf{normal}. Beispiele: $V_k, \ k=1,2,\ldots$ und $V_\mathrm{input}$.
+\end{itemize}
+
+
+
+\section*{Danksagung}
+Wenn ihr jemanden danken wollt, der Euch bei der Arbeit besonders
+unterstützt hat (Korrekturlesen, fachliche Hinweise,...), dann ist hier der dafür vorgesehene Platz.
+
+\begin{thebibliography}{1}
+\bibitem{IEEEhowto:kopka}
+H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed. Harlow, England: Addison-Wesley, 1999.
+\bibitem{wissPraxis:DFG}
+Deutsche Forschungsgemeinschaft, \emph{Vorschläge zur Sicherung guter wissenschaftlicher Praxis}, Denkschrift, Weinheim: Wiley-VCH, 1998.
+\end{thebibliography}
+
+\begin{biography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./pics/ComicKopf.eps}}] % hier ein Foto einbinden
+{Autor A}
+Biographie Autor A.
+\end{biography}
+\begin{biography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./pics/ComicKopf.eps}}] % hier ein Foto einbinden
+{Autor B}
+Biographie Autor B.
+\end{biography}
+\begin{biography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{./pics/ComicKopf.eps}}] % hier ein Foto einbinden
+{Autor C}
+Biographie Autor C.
+\end{biography}
+
+\end{document}
