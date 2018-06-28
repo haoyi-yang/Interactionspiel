@@ -5,38 +5,39 @@ from utils import get_win_rate, get_stack, is_raise_limit_reached
 import numpy as np
 import sqlite3 as lite
 
+Strategy_array = [1, 4, 2, 3, 5, 0] #length must be 6 begin from 0
 db_name = 'game_information.db'
 class InteractivePlayer(BasePokerPlayer):
     def __init__(self):
         #First type of defensive player
         self.raise_threshold_defensive_1 = 0.8
-        self.fold_threshold_defensive_1 = 0.5
+        self.fold_threshold_defensive_1 = 0.6
         self.bluffing_max_defensive_1 = 0.3
 
         #Second type of defensive player
         self.raise_threshold_defensive_2 = 0.75
-        self.fold_threshold_defensive_2 = 0.45
+        self.fold_threshold_defensive_2 = 0.55
         self.bluffing_max_defensive_2 = 0.25
 
         #Third type of defensive player
         self.raise_threshold_defensive_3 = 0.7
-        self.fold_threshold_defensive_3 = 0.4
+        self.fold_threshold_defensive_3 = 0.5
         self.bluffing_max_defensive_3 = 0.3
 
         #First type of aggressive player
         self.raise_threshold_aggressive_1 = 0.6
-        self.fold_threshold_aggressive_1 = 0.2
+        self.fold_threshold_aggressive_1 = 0.3
         self.bluffing_max_aggresive_1 = 0.45
         #Second type of aggressive player
         self.raise_threshold_aggressive_2 = 0.65
-        self.fold_threshold_aggressive_2 = 0.25
+        self.fold_threshold_aggressive_2 = 0.35
         self.bluffing_max_aggresive_2 = 0.4
         #Third type of aggressive player
         self.raise_threshold_aggressive_3 = 0.7
-        self.fold_threshold_aggressive_3 = 0.3
+        self.fold_threshold_aggressive_3 = 0.4
         self.bluffing_max_aggresive_3 = 0.35
 
-        self.player_type = 0 # 0 => defensiv_1 1 => defensive_2 2 => defensive_3 3 => aggressive_1 4 => aggressive_2 5 => aggressive_3
+        self.player_type = Strategy_array[0] # 0 => defensiv_1 1 => defensive_2 2 => defensive_3 3 => aggressive_1 4 => aggressive_2 5 => aggressive_3
         self.strategy_change_count = 100 #how many hands it will change its strategy
         
         self.hand_count = 0
@@ -45,6 +46,7 @@ class InteractivePlayer(BasePokerPlayer):
         self.opponent_fold_count = 0
         self.opponent_raise_count = 0
         self.opponent_call_count = 0
+
     def declare_action(self, valid_actions, hole_card, round_state):
         community_card = round_state['community_card']
         # pot = round_state['pot']['main']['amount']
@@ -87,10 +89,10 @@ class InteractivePlayer(BasePokerPlayer):
         bet = self.parse_self_bet(round_state)
         betOpponent = round_state['pot']['main']['amount']
         r = np.random.random()
-        if self.hand_count % 50 == 0:
-            self.player_type = random.sample(range(6), 1)[0]
+        if self.hand_count % self.strategy_change_count == 0:
+            self.player_type = Strategy_array[int(self.hand_count / self.strategy_change_count) % 6]
             # self.player_type = random_type_array[0]
-            
+            print(self.player_type)
         #set the player parameters      
         if self.player_type == 0:
             raise_threshold = self.raise_threshold_defensive_1
@@ -164,24 +166,24 @@ class InteractivePlayer(BasePokerPlayer):
             else:
                 raise('?????')
         
-            if not self.opponent_hand_count == 0 and self.opponent_hand_count % 50 == 0:
+            if not self.opponent_hand_count == 0 and self.opponent_hand_count % self.strategy_change_count == 0:
                 record = []
-                record.append(self.opponent_call_count / 50.)
-                record.append(self.opponent_fold_count / 50.)
-                record.append(self.opponent_raise_count / 50.)
+                record.append(self.opponent_call_count / self.strategy_change_count)
+                record.append(self.opponent_fold_count / self.strategy_change_count)
+                record.append(self.opponent_raise_count / self.strategy_change_count)
 
                 if self.player_type == 0:
-                    record.append('defensive_1_r0.80f0.50b0.30')
+                    record.append('defensive_1')
                 elif self.player_type == 1:
-                    record.append('defensive_2_r0.75f0.45b0.25')
+                    record.append('defensive_2')
                 elif self.player_type == 2:
-                    record.append('defensive_3_r0.70f0.40b0.30')
+                    record.append('defensive_3')
                 elif self.player_type == 3:
-                    record.append('aggressive_1_r0.60f0.20b0.45')
+                    record.append('aggressive_1')
                 elif self.player_type == 4:
-                    record.append('aggressive_2_r0.65f0.25b0.40')
+                    record.append('aggressive_2')
                 elif self.player_type == 5:
-                    record.append('aggressive_3_r0.70f0.30b0.35')
+                    record.append('aggressive_3')
                 else:
                     raise('>>>>>>>no such type<<<<<<<<<<')
 
