@@ -89,10 +89,12 @@ class InteractivePlayer(BasePokerPlayer):
         bet = self.parse_self_bet(round_state)
         betOpponent = round_state['pot']['main']['amount']
         r = np.random.random()
-        if self.hand_count % self.strategy_change_count == 0:
+        if self.opponent_hand_count % self.strategy_change_count == 0:
+            # self.player_last_type = self.player_type
             self.player_type = Strategy_array[int(self.hand_count / self.strategy_change_count) % 6]
             # self.player_type = random_type_array[0]
-            print(self.player_type)
+            # print(self.hand_count)
+            # print(self.player_type)
         #set the player parameters      
         if self.player_type == 0:
             raise_threshold = self.raise_threshold_defensive_1
@@ -136,7 +138,12 @@ class InteractivePlayer(BasePokerPlayer):
             else:
                 return valid_actions[1]['action'], valid_actions[1]['amount']
         elif win_rate < fold_threshold:
+            if valid_actions[1]['amount'] == 0:
+
+                 return valid_actions[1]['action'], valid_actions[1]['amount']
+
             if EV_fold > EV_call:
+                # print("I fold! with the call amount: " + str(valid_actions[1]['amount']))
                 return valid_actions[0]['action'], valid_actions[0]['amount']
             else:
                 return valid_actions[1]['action'], valid_actions[1]['amount']
@@ -156,44 +163,17 @@ class InteractivePlayer(BasePokerPlayer):
         
     def record_opponent(self, new_action, round_state):
         if not new_action['player_uuid'] == self.uuid:
-            self.opponent_hand_count += 1
-            if new_action['action'] == 'raise':
-                self.opponent_raise_count += 1
-            elif new_action['action'] == 'fold':
-                self.opponent_fold_count += 1
-            elif new_action['action'] == 'call':
-                self.opponent_call_count += 1
-            else:
-                raise('?????')
+            self._accumulate_opponent_statistic(new_action)
+            self._insert_not_enough_table(new_action)
+
         
             if not self.opponent_hand_count == 0 and self.opponent_hand_count % self.strategy_change_count == 0:
-                record = []
-                record.append(self.opponent_call_count / self.strategy_change_count)
-                record.append(self.opponent_fold_count / self.strategy_change_count)
-                record.append(self.opponent_raise_count / self.strategy_change_count)
-
-                if self.player_type == 0:
-                    record.append('defensive_1')
-                elif self.player_type == 1:
-                    record.append('defensive_2')
-                elif self.player_type == 2:
-                    record.append('defensive_3')
-                elif self.player_type == 3:
-                    record.append('aggressive_1')
-                elif self.player_type == 4:
-                    record.append('aggressive_2')
-                elif self.player_type == 5:
-                    record.append('aggressive_3')
-                else:
-                    raise('>>>>>>>no such type<<<<<<<<<<')
-
-                self.opponent_fold_count = 0
-                self.opponent_raise_count = 0
-                self.opponent_call_count = 0
+                record = self.make_percentage_record()
                 con = lite.connect(db_name)
 
                 with con:
                     cur = con.cursor()
+                    cur.execute("DROP TABLE {tn}".format(tn = self.NotEnoughTable))
                     cur.execute("INSERT INTO {tn}(call_percentage, fold_percentage, raise_percentage, AI_type) VALUES(?,?,?,?)".format(tn = self.oppo_table_name), record)
 
     def init_opponent_table(self, game_info):
@@ -201,17 +181,80 @@ class InteractivePlayer(BasePokerPlayer):
             if not player['uuid'] == self.uuid:
                 opponent_name = player['name']
         self.oppo_table_name = "Percentages_record_{on}".format(on = opponent_name)
+        self.NotEnoughTable = "Table_not_enough_the_wanted_round_" + opponent_name
         con = lite.connect(db_name)
 
         with con:
             cur = con.cursor()
             cur.execute("CREATE TABLE IF NOT EXISTS {nt}(_Id INTEGER PRIMARY KEY, call_percentage REAL, fold_percentage REAL, raise_percentage REAL, AI_type TEXT)".format(nt = self.oppo_table_name))
+            cur.execute("CREATE TABLE IF NOT EXISTS {nt}(_Id INTEGER PRIMARY KEY, Action TEXT, AI_type TEXT)".format(nt = self.NotEnoughTable))
 
-#     def ev_calculation(self, win_rate, pot, call_amount, self_bet, raise_amount):
-#         ev = [0 for i in range(3)]
-#         ev[0] = -self_bet
-#         ev[1] = win_rate * (pot - self_bet) - (1 - win_rate) * call_amount
-#         ev[2] = win_rate * (pot - self_bet + 2 * self.small_blind_amount) - (1 - win_rate) * raise_amount
-#         return ev
+
+    def make_percentage_record(self):
+        record = []
+        record.append(self.opponent_call_count / self.strategy_change_count)
+        record.append(self.opponent_fold_count / self.strategy_change_count)
+        record.append(self.opponent_raise_count / self.strategy_change_count)
+
+        if self.player_type == 0:
+            record.append('defensive_1')
+        elif self.player_type == 1:
+            record.append('defensive_2')
+        elif self.player_type == 2:
+            record.append('defensive_3')
+        elif self.player_type == 3:
+            record.append('aggressive_1')
+        elif self.player_type == 4:
+            record.append('aggressive_2')
+        elif self.player_type == 5:
+            record.append('aggressive_3')
+        else:
+            raise('>>>>>>>no such type<<<<<<<<<<')
+
+        self.opponent_fold_count = 0
+        self.opponent_raise_count = 0
+        self.opponent_call_count = 0
+
+        return record
+
+    def _insert_not_enough_table(self, new_action):
+
+        record = []
+        record.append(new_action['action'])
+
+        if self.player_type == 0:
+            record.append('defensive_1')
+        elif self.player_type == 1:
+            record.append('defensive_2')
+        elif self.player_type == 2:
+            record.append('defensive_3')
+        elif self.player_type == 3:
+            record.append('aggressive_1')
+        elif self.player_type == 4:
+            record.append('aggressive_2')
+        elif self.player_type == 5:
+            record.append('aggressive_3')
+        else:
+            raise('>>>>>>>no such type<<<<<<<<<<')
+
+        con = lite.connect(db_name)
+
+        with con:
+            cur = con.cursor()
+            cur.execute("CREATE TABLE IF NOT EXISTS {nt}(_Id INTEGER PRIMARY KEY, Action TEXT, AI_type TEXT)".format(nt = self.NotEnoughTable))
+            cur.execute("INSERT INTO {tn}(Action, AI_type) VALUES(?,?)".format(tn = self.NotEnoughTable), record)
+
+    def _accumulate_opponent_statistic(self, new_action):
+        self.opponent_hand_count += 1
+        if new_action['action'] == 'raise':
+            self.opponent_raise_count += 1
+        elif new_action['action'] == 'fold':
+            self.opponent_fold_count += 1
+        elif new_action['action'] == 'call':
+            self.opponent_call_count += 1
+        else:
+            raise('?????')
+
+
 def setup_ai():
     return InteractivePlayer()
