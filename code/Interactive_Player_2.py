@@ -73,6 +73,7 @@ class InteractivePlayer(BasePokerPlayer):
 
     def receive_game_update_message(self, action, round_state):
         self.record_opponent(action, round_state)
+        self._change_strategie()
 
     def receive_round_result_message(self, winners, hand_info, round_state):
         pass
@@ -88,13 +89,7 @@ class InteractivePlayer(BasePokerPlayer):
         # bet = round_state['pot']['main']['amount'] - valid_actions[1]['amount']
         bet = self.parse_self_bet(round_state)
         betOpponent = round_state['pot']['main']['amount']
-        r = np.random.random()
-        if self.opponent_hand_count % self.strategy_change_count == 0:
-            # self.player_last_type = self.player_type
-            self.player_type = Strategy_array[int(self.hand_count / self.strategy_change_count) % 6]
-            # self.player_type = random_type_array[0]
-            # print(self.hand_count)
-            # print(self.player_type)
+        r = np.random.random()       
         #set the player parameters      
         if self.player_type == 0:
             raise_threshold = self.raise_threshold_defensive_1
@@ -255,6 +250,13 @@ class InteractivePlayer(BasePokerPlayer):
         else:
             raise('?????')
 
+    def _change_strategie(self):
+        if self.opponent_hand_count % self.strategy_change_count == 0:
+            # self.player_last_type = self.player_type
+            self.player_type = Strategy_array[int(self.opponent_hand_count / self.strategy_change_count) % 6]
+            # self.player_type = random_type_array[0]
+            # print(self.opponent_hand_count)
+            # print(self.player_type)
 
 def setup_ai():
     return InteractivePlayer()
