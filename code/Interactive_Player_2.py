@@ -10,31 +10,31 @@ db_name = 'game_information.db'
 class InteractivePlayer(BasePokerPlayer):
     def __init__(self):
         #First type of defensive player
-        self.raise_threshold_defensive_1 = 0.8
-        self.fold_threshold_defensive_1 = 0.6
-        self.bluffing_max_defensive_1 = 0.3
+        self.raise_threshold_defensive_1 = 0.95
+        self.fold_threshold_defensive_1 = 0.8
+        self.bluffing_max_defensive_1 = 0.1
 
         #Second type of defensive player
-        self.raise_threshold_defensive_2 = 0.75
-        self.fold_threshold_defensive_2 = 0.55
-        self.bluffing_max_defensive_2 = 0.25
+        self.raise_threshold_defensive_2 = 0.85
+        self.fold_threshold_defensive_2 = 0.75
+        self.bluffing_max_defensive_2 = 0.15
 
         #Third type of defensive player
-        self.raise_threshold_defensive_3 = 0.7
-        self.fold_threshold_defensive_3 = 0.5
-        self.bluffing_max_defensive_3 = 0.3
+        self.raise_threshold_defensive_3 = 0.75
+        self.fold_threshold_defensive_3 = 0.65
+        self.bluffing_max_defensive_3 = 0.20
 
         #First type of aggressive player
-        self.raise_threshold_aggressive_1 = 0.6
-        self.fold_threshold_aggressive_1 = 0.3
+        self.raise_threshold_aggressive_1 = 0.50
+        self.fold_threshold_aggressive_1 = 0.25
         self.bluffing_max_aggresive_1 = 0.45
         #Second type of aggressive player
-        self.raise_threshold_aggressive_2 = 0.65
-        self.fold_threshold_aggressive_2 = 0.35
+        self.raise_threshold_aggressive_2 = 0.60
+        self.fold_threshold_aggressive_2 = 0.30
         self.bluffing_max_aggresive_2 = 0.4
         #Third type of aggressive player
-        self.raise_threshold_aggressive_3 = 0.7
-        self.fold_threshold_aggressive_3 = 0.4
+        self.raise_threshold_aggressive_3 = 0.65
+        self.fold_threshold_aggressive_3 = 0.35
         self.bluffing_max_aggresive_3 = 0.35
 
         self.player_type = Strategy_array[0] # 0 => defensiv_1 1 => defensive_2 2 => defensive_3 3 => aggressive_1 4 => aggressive_2 5 => aggressive_3
