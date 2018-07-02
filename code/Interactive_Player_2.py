@@ -10,31 +10,31 @@ db_name = 'game_information.db'
 class InteractivePlayer(BasePokerPlayer):
     def __init__(self):
         #First type of defensive player
-        self.raise_threshold_defensive_1 = 0.8
-        self.fold_threshold_defensive_1 = 0.6
-        self.bluffing_max_defensive_1 = 0.3
+        self.raise_threshold_defensive_1 = 0.95
+        self.fold_threshold_defensive_1 = 0.8
+        self.bluffing_max_defensive_1 = 0.1
 
         #Second type of defensive player
-        self.raise_threshold_defensive_2 = 0.75
-        self.fold_threshold_defensive_2 = 0.55
-        self.bluffing_max_defensive_2 = 0.25
+        self.raise_threshold_defensive_2 = 0.85
+        self.fold_threshold_defensive_2 = 0.75
+        self.bluffing_max_defensive_2 = 0.15
 
         #Third type of defensive player
-        self.raise_threshold_defensive_3 = 0.7
-        self.fold_threshold_defensive_3 = 0.5
-        self.bluffing_max_defensive_3 = 0.3
+        self.raise_threshold_defensive_3 = 0.75
+        self.fold_threshold_defensive_3 = 0.65
+        self.bluffing_max_defensive_3 = 0.20
 
         #First type of aggressive player
-        self.raise_threshold_aggressive_1 = 0.6
-        self.fold_threshold_aggressive_1 = 0.3
+        self.raise_threshold_aggressive_1 = 0.50
+        self.fold_threshold_aggressive_1 = 0.25
         self.bluffing_max_aggresive_1 = 0.45
         #Second type of aggressive player
-        self.raise_threshold_aggressive_2 = 0.65
-        self.fold_threshold_aggressive_2 = 0.35
+        self.raise_threshold_aggressive_2 = 0.60
+        self.fold_threshold_aggressive_2 = 0.30
         self.bluffing_max_aggresive_2 = 0.4
         #Third type of aggressive player
-        self.raise_threshold_aggressive_3 = 0.7
-        self.fold_threshold_aggressive_3 = 0.4
+        self.raise_threshold_aggressive_3 = 0.65
+        self.fold_threshold_aggressive_3 = 0.35
         self.bluffing_max_aggresive_3 = 0.35
 
         self.player_type = Strategy_array[0] # 0 => defensiv_1 1 => defensive_2 2 => defensive_3 3 => aggressive_1 4 => aggressive_2 5 => aggressive_3
@@ -73,6 +73,7 @@ class InteractivePlayer(BasePokerPlayer):
 
     def receive_game_update_message(self, action, round_state):
         self.record_opponent(action, round_state)
+        self._change_strategie()
 
     def receive_round_result_message(self, winners, hand_info, round_state):
         pass
@@ -88,13 +89,7 @@ class InteractivePlayer(BasePokerPlayer):
         # bet = round_state['pot']['main']['amount'] - valid_actions[1]['amount']
         bet = self.parse_self_bet(round_state)
         betOpponent = round_state['pot']['main']['amount']
-        r = np.random.random()
-        if self.opponent_hand_count % self.strategy_change_count == 0:
-            # self.player_last_type = self.player_type
-            self.player_type = Strategy_array[int(self.hand_count / self.strategy_change_count) % 6]
-            # self.player_type = random_type_array[0]
-            # print(self.hand_count)
-            # print(self.player_type)
+        r = np.random.random()       
         #set the player parameters      
         if self.player_type == 0:
             raise_threshold = self.raise_threshold_defensive_1
@@ -255,6 +250,13 @@ class InteractivePlayer(BasePokerPlayer):
         else:
             raise('?????')
 
+    def _change_strategie(self):
+        if self.opponent_hand_count % self.strategy_change_count == 0:
+            # self.player_last_type = self.player_type
+            self.player_type = Strategy_array[int(self.opponent_hand_count / self.strategy_change_count) % 6]
+            # self.player_type = random_type_array[0]
+            # print(self.opponent_hand_count)
+            # print(self.player_type)
 
 def setup_ai():
     return InteractivePlayer()
